@@ -1,241 +1,182 @@
-  }
+<?php
+$jsonHtml = json_decode(file_get_contents("https://sheets.googleapis.com/v4/spreadsheets/1S5v7kTbSiqV8GottWVi5tzpqLdTrEgWEY4ND4zvyV3o/values:batchGet?ranges=A%3AA&ranges=B%3AB&ranges=C%3AC&ranges=D%3AD&key=AIzaSyDwH-ws7le4K2YbeJ-IOVv200LFuTVuOtU"));
+//Temp Sheet
+//$jsonHtml = json_decode(file_get_contents("https://sheets.googleapis.com/v4/spreadsheets/1tJllDysWV5Xn9C7MKlVDttPXp2jXuQCYLP3jbf4FW28/values:batchGet?ranges=A%3AA&ranges=B%3AB&ranges=C%3AC&ranges=D%3AD&key=AIzaSyDwH-ws7le4K2YbeJ-IOVv200LFuTVuOtU"));
+
+$not_arrived_message = "";
+
+$locations = array();
+$names = array();
+$len = count($jsonHtml->valueRanges[0]->values);
+for($i = 1; $i<$len; $i++) {
+    array_push($names,$jsonHtml->valueRanges[0]->values[$i][0]);
+}
+$len = count($jsonHtml->valueRanges[2]->values);
+for($i = 1; $i<$len; $i++) {
+    array_push($names,$jsonHtml->valueRanges[2]->values[$i][0]);
+}
+$len = count($jsonHtml->valueRanges[0]->values);
+for($i = 1; $i<$len; $i++) {
+    array_push($locations,isset($jsonHtml->valueRanges[1]->values[$i][0]) ? $jsonHtml->valueRanges[1]->values[$i][0] : $not_arrived_message);
+}
+$len = count($jsonHtml->valueRanges[2]->values);
+for($i = 1; $i<$len; $i++) {
+    array_push($locations,isset($jsonHtml->valueRanges[3]->values[$i][0]) ? $jsonHtml->valueRanges[3]->values[$i][0] : $not_arrived_message);
 }
 
-function turn(){
+$names = array_map('trim',$names);
+$names = array_map('ucwords',$names);
+$locations = array_map('trim',$locations);
 
-    if(!addedCityLabel){
+$maxrows = count($locations) > count($names) ? count($locations) : count($names);
 
-      appendColumn();
+?>
 
+<!DOCTYPE html>
+<html lang="en">
 
-      var elementExists = document.getElementById("game-leaderboard");
-      var numplayers = elementExists.querySelectorAll('.leaderboard-name').length;
-      var leaderboard = document.getElementById('game-leaderboard');
-
-      for (var i = 0; i < numplayers; i ++){
-        players.push(leaderboard.rows[i + 1].children[1 + inTeamGame].classList[1]);
-      }
-
-      for (var i = 0; i < numplayers; i++) {
-        data[players[i]] = new Array();
-        last[players[i]] = new Array();
-        last[players[i]] = new Array();
-        cities[players[i]] = new Array();
-      }
-
-      addedCityLabel = true;
-    }
-
-    var leaderboard = document.getElementById('game-leaderboard');
-    var elementExists = document.getElementById("game-leaderboard");
-    var numplayers = elementExists.querySelectorAll('.leaderboard-name').length;
-
-
-    for(var j = 0; j < numplayers; j++){
-      var playerColor = players[j];
-      if (typeof last == 'undefined' || last.length < 1) {
-        last[playerColor].push(getPlayerArmy(playerColor));
-      }
-
-      else {
-        inc = parseInt(getPlayerArmy(playerColor)) - parseInt(last[playerColor][last[playerColor].length - 1]);
-        last[playerColor].push(getPlayerArmy(playerColor));
-        if (inc > 0){
-          data[playerColor].push(inc);
+<head>
+    <script>
+        function setCookie(cname, cvalue, exdays) {
+                var d = new Date();
+                d.setTime(d.getTime() + (exdays*24*60*60*1000));
+                var expires = "expires="+ d.toUTCString();
+                document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+                location.reload();
         }
+    </script>
+    <script> location.hash = (location.hash) ? location.hash : " "; </script> <!-- Resets scroll position -->
+    <!-- Meta Tags/Site Setup -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="robots" content="index,follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');ga('create', 'UA-86115073-5', 'auto');ga('send', 'pageview');
 
-        if (inc > 0 && data[playerColor].length > 7){
-          guess_cities = mode(data[playerColor].slice(data[playerColor].length - 6));
+</script>
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
+    <link rel="icon" href="favicon.ico?" type="image/x-icon">
 
-
-
-          cities[playerColor].push(guess_cities);
+    <title><?php
+        if(isset($_COOKIE['favorite']) and in_array($_COOKIE['favorite'], $names)) {
+            if($locations[array_search($_COOKIE['favorite'],$names)] !== "") { echo(ucfirst($locations[array_search($_COOKIE['favorite'], $names)]) . " &middot; "); }
         }
-      }
+        ?>BCABus</title>
 
-      if (!(typeof cities[playerColor] == 'undefined' || cities[playerColor].length < 1)) {
-        setPlayerCities(playerColor, cities[playerColor][cities[playerColor].length - 1] - 1);
+    <!-- CSS/JQuery/ScrollTo/Materialize -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-    }
-  }
-}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.scrollto/2.1.2/jquery.scrollTo.min.js"></script>
+    <script src="bcabus.js"></script>
+    </head>
+    <body class="blue lighten-5">
+    <head>
+    <!-- Search -->
+    <nav class="search-nav blue">
+    <div class="nav-wrapper">
+        <form>
+            <div class="input-field">
+            <input class="left-align" id="search" type="search" placeholder="Search for towns here..." autocomplete="off">
+            <label for="search"><i class="material-icons">search</i></label>
+            </div>
+        </form>
+    </div>
+    </nav>
+    </head>
+    <!-- Town Display -->
+    <main>
+        <?php if(!isset($_COOKIE['madeby']) and rand(0,1) == 1) { ?>
+        <div class="madeBy blue lighten-3 white-text center-align">Made by: Luke LaScala &amp; Adam Papenhausen<i onclick='setCookie("madeby", "none", 1000);' class="closeMadeBy material-icons secondary-content">close</i></div>
+        <?php } else if(!isset($_COOKIE['madeby'])) { ?>
+	<div class="madeBy blue lighten-3 white-text center-align">Made by: Adam Papenhausen &amp; Luke LaScala<i onclick='setCookie("madeby", "none", 1000);' class="closeMadeBy material-icons secondary-content">close</i></div>
+	<?php } ?>
+        <div class="row" style="padding-top: 2%">
+            <div class="col l8 offset-l2 m6 offset-m3 s12">
+                <!-- Favorite Town -->
+                <?php if(isset($_COOKIE['favorite']) and in_array($_COOKIE['favorite'], $names)) { ?>
+                    <ul class="collection favoriteList">
+                        <li class="collection-item favoriteItem"><i onclick='setCookie("favorite", "none", -1);' style="font-size: 3rem; color: gold; cursor: pointer" class="starIcon material-icons secondary-content">star</i><h5 class="favoriteTown"><?php echo($_COOKIE['favorite']); ?></h5><h5 class="favoriteLocation"><?php if($locations[array_search($_COOKIE['favorite'],$names)] == "") { echo("Not here yet!"); } else { echo(ucfirst($locations[array_search($_COOKIE['favorite'], $names)])); }?></h5>
+                        </li>
+                    </ul>
+                <?php } ?>
+                <!-- Town List -->
+                <ul class="townList collection with-header">
+                    <li class="collection-header townList-header valign-wrapper"><h2>Town List</h2></li>
+                    <?php for($i = 0; $i<$maxrows; $i++){ ?>
+                    <li id="<?php echo(strtolower($names[$i])) ?>" class="collection-item townItem row"><p class="col l8 m8 s8"><span><?php echo($names[$i]); ?></span></p><span class="locationAlign col l4 m4 s4 right-align"><?php echo(ucfirst($locations[$i])); ?>&nbsp;&nbsp;<i onclick="setCookie('favorite', '<?php echo($names[$i]); ?>', 1000);" style="color: grey; cursor: pointer" class="starIcon1 material-icons secondary-content">star</i></span></li>
+                    <?php } ?>
+                </ul>
+            </div>
+        </div>
 
-turnInterval = setInterval(function() {
-
-  if (inGame()){
-    if (playingTeamGame()){
-      inTeamGame = 1;
-    }
-    turn();
-  } else {
-    addedCityLabel = false
-  }
-}, 500);Lukes-MacBook-Pro:chrome-extension-generals luklas$ vim manifest.json
-Lukes-MacBook-Pro:chrome-extension-generals luklas$ cd ~/Documents/github/
-.DS_Store                  temp/
-chrome-extension-generals/
-Lukes-MacBook-Pro:chrome-extension-generals luklas$ cd ~/Documents/github/chrome-extension-generals/
-Lukes-MacBook-Pro:chrome-extension-generals luklas$ cd ..
-Lukes-MacBook-Pro:github luklas$ ls
-chrome-extension-generals	temp
-Lukes-MacBook-Pro:github luklas$ cd ..
-Lukes-MacBook-Pro:Documents luklas$ ls
-ABCTF				National Honor Society
-AP Micro			Nick
-American Literature		Scans
-CS				Science
-CTF				Snow Warriors
-Chemistry			Untitled.rkt
-Clubs attendance.numbers	Untitled.rkt~
-DE				Workspace2
-Flask-HelloWorldBot		World_of_Tanks
-Francais			advent-of-code-2016
-History				botty
-IlLSNOW				fb-messenger-bot
-Math				flasktutorial
-Melani Printing			github
-My Documents			match-that-hatch
-My Movie 1.mp4			microblog
-My Pictures			testing
-My Videos			ultimate-tic-tac-toe
-Lukes-MacBook-Pro:Documents luklas$ cd ultimate-tic-tac-toe/
-Lukes-MacBook-Pro:ultimate-tic-tac-toe luklas$ git add -A
-Lukes-MacBook-Pro:ultimate-tic-tac-toe luklas$ git commit -m "Added back button"
-[master 0541bbb] Added back button
- 2 files changed, 1 deletion(-)
- rewrite Ultimate Tic Tac Toe.xcworkspace/xcuserdata/luklas.xcuserdatad/UserInterfaceState.xcuserstate (79%)
-Lukes-MacBook-Pro:ultimate-tic-tac-toe luklas$ git push
-Counting objects: 27, done.
-Delta compression using up to 4 threads.
-Compressing objects: 100% (26/26), done.
-Writing objects: 100% (27/27), 37.19 KiB | 0 bytes/s, done.
-Total 27 (delta 13), reused 0 (delta 0)
-remote: Resolving deltas: 100% (13/13), completed with 7 local objects.
-To https://github.com/LiamRahav/ultimate-tic-tac-toe
-   bd65b3a..0541bbb  master -> master
-Lukes-MacBook-Pro:ultimate-tic-tac-toe luklas$ git add -A
-Lukes-MacBook-Pro:ultimate-tic-tac-toe luklas$ git commit -m "Added functional back button"
-[master a055bac] Added functional back button
- 2 files changed, 32 insertions(+)
- rewrite Ultimate Tic Tac Toe.xcworkspace/xcuserdata/luklas.xcuserdatad/UserInterfaceState.xcuserstate (60%)
-Lukes-MacBook-Pro:ultimate-tic-tac-toe luklas$ git push
-Counting objects: 8, done.
-Delta compression using up to 4 threads.
-Compressing objects: 100% (8/8), done.
-Writing objects: 100% (8/8), 11.37 KiB | 0 bytes/s, done.
-Total 8 (delta 4), reused 0 (delta 0)
-remote: Resolving deltas: 100% (4/4), completed with 4 local objects.
-To https://github.com/LiamRahav/ultimate-tic-tac-toe
-   0541bbb..a055bac  master -> master
-Lukes-MacBook-Pro:ultimate-tic-tac-toe luklas$ ssh root@159.203.129.55
-root@159.203.129.55's password:
-Permission denied, please try again.
-root@159.203.129.55's password:
-Welcome to Ubuntu 14.04.4 LTS (GNU/Linux 4.4.0-31-generic x86_64)
-
- * Documentation:  https://help.ubuntu.com/
-
-  System information as of Tue Dec 20 09:21:07 EST 2016
-
-▽
-$(document).ready(function() {
-    $favoriteList = $(".favoriteList");
-    $madeBy = $(".madeBy");
-    $closeMsg = $(".closeMadeBy");
-
-    function getCookie(name) {
-        var dc = document.cookie;
-        var prefix = name + "=";
-        var begin = dc.indexOf("; " + prefix);
-        if (begin == -1) {
-            begin = dc.indexOf(prefix);
-            if (begin != 0) return null;
+    </main>
+    <!-- Footer -->
+    <footer class="valign page-footer blue darken-2 light-blue-text text-lighten-5 center-align">
+        <div style="padding-bottom: 5%"><h3>BCA Bus</h3><h6>Find your bus from anywhere.</h6><h6>Questions? Answers? Email us at <span class="email">adapap@bergen.org</span> or <span class="email">luklas@bergen.org</span>.</h6></div>
+        </footer>
+    </body>
+    <style>
+        #sitewrap {
         }
-        else
-        {
-            begin += 2;
-            var end = document.cookie.indexOf(";", begin);
-            if (end == -1) {
-            end = dc.length;
+        ::-webkit-input-placeholder {
+        color: white;
+        }
+        :-moz-placeholder { /* Firefox 18- */
+           color: white;
+        }
+        ::-moz-placeholder {  /* Firefox 19+ */
+           color: white;
+        }
+        :-ms-input-placeholder {
+           color: white;
+        }
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+        .closeMadeBy {
+            padding-right: 1%;
+            color: white;
+            font-size: 1.5rem;
+            transition: color 0.5s ease;
+        }
+        .closeMadeBy:hover {
+            color: black;
+        }
+        .email {
+            border-bottom: 1px solid white;
+            color: white;
+        }
+        .madeBy {
+            width: 100%;
+            padding: 1% 0;
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        @media only screen and (max-width: 768px) { /* Mobile */
+            .locationAlign {
+                margin-top: 5%;
+            }
+            .starIcon1 {
+                margin-top: -3%;
             }
         }
-        return decodeURI(dc.substring(begin + prefix.length, end));
-    }
-    var favCookie = getCookie("favorite");
-"bcabus.js" [noeol][dos] 49L, 1505C                           1,1           Top
-    }
-    var favCookie = getCookie("favorite");
-    if (favCookie == null) {
-        Materialize.toast("Click the star to set a favorite town",6000);
-    }
-    var closeCookie = getCookie("madeby");
-    $closeMsg.click(function() {
-        $madeBy.slideUp(100);
-    })
-
-    //Works by #id of the list element
-    $search = $("input[type='search']");
-    $townItem = $(".townItem");
-    $townHeader = $(".townList-header");
-    $search.keyup(function() {
-        $town = $search.val().toLowerCase();
-        if ($town !== "") {
-            $townItem.not("[id*='" + $town + "']").hide(100);
-            $(".collection-item[id*='" + $town + "']").show(100);
-            $townHeader.hide(100);
-        }
-        else {
-            $townItem.show(100);
-            $townHeader.show(100);
-                                                              23,5          88%
-$(document).ready(function() {
-    $favoriteList = $(".favoriteList");
-    $madeBy = $(".madeBy");
-    $closeMsg = $(".closeMadeBy");
-
-    function getCookie(name) {
-        var dc = document.cookie;
-        var prefix = name + "=";
-        var begin = dc.indexOf("; " + prefix);
-        if (begin == -1) {
-            begin = dc.indexOf(prefix);
-            if (begin != 0) return null;
-        }
-        else
-        {
-            begin += 2;
-            var end = document.cookie.indexOf(";", begin);
-            if (end == -1) {
-            end = dc.length;
+        @media only screen and (min-width: 768px) { /* Desktop */
+            .locationAlign {
+                margin-top: 2%;
+            }
+            .starIcon1 {
+                margin-top: -1%;
             }
         }
-        return decodeURI(dc.substring(begin + prefix.length, end));
-    }
-    var favCookie = getCookie("favorite");
-                                                              1,1           Top
-    }
-    var favCookie = getCookie("favorite");
-    if (favCookie == null) {
-        Materialize.toast("Click the star to set a favorite town",6000);
-    }
-    var closeCookie = getCookie("madeby");
-    $closeMsg.click(function() {
-        $madeBy.slideUp(100);
-    })
-
-    //Works by #id of the list element
-    $search = $("input[type='search']");
-    $townItem = $(".townItem");
-    $townHeader = $(".townList-header");
-    $search.keyup(function() {
-        $town = $search.val().toLowerCase();
-        if ($town !== "") {
-            $townItem.not("[id*='" + $town + "']").hide(100);
-            $(".collection-item[id*='" + $town + "']").show(100);
-            $townHeader.hide(100);
-        }
-        else {
-            $townItem.show(100);
-            $townHeader.show(100);
-                                                              23,5          88%
-})
+    </style>
+</html>
