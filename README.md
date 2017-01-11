@@ -1,6 +1,6 @@
 # mybcabus
 
-https://mybcabus.com
+###mybcabus
 
-BCA Bus Tracking
+Shows bus locations [here](https://mybcabus.com) as they are added into the google doc.
 
