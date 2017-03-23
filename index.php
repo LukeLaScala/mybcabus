@@ -93,9 +93,9 @@ $maxrows = count($locations) > count($names) ? count($locations) : count($names)
     <!-- Town Display -->
     <main>
         <?php if(!isset($_COOKIE['madeby']) and rand(0,1) == 1) { ?>
-        <div class="madeBy blue lighten-3 white-text center-align">Made by: Luke LaScala &amp; Adam Papenhausen<i onclick='setCookie("madeby", "none", 1000);' class="closeMadeBy material-icons secondary-content">close</i></div>
+        <div class="madeBy blue lighten-3 white-text center-align">Sorry for the downtime yesterday - Luke LaScala<i onclick='setCookie("madeby", "none", 1000);' class="closeMadeBy material-icons secondary-content">close</i></div>
         <?php } else if(!isset($_COOKIE['madeby'])) { ?>
-	<div class="madeBy blue lighten-3 white-text center-align">Made by: Adam Papenhausen &amp; Luke LaScala<i onclick='setCookie("madeby", "none", 1000);' class="closeMadeBy material-icons secondary-content">close</i></div>
+	<div class="madeBy blue lighten-3 white-text center-align">Sorry for the downtime yesterday - Luke LaScala<i onclick='setCookie("madeby", "none", 1000);' class="closeMadeBy material-icons secondary-content">close</i></div>
 	<?php } ?>
         <div class="row" style="padding-top: 2%">
             <div class="col l8 offset-l2 m6 offset-m3 s12">
