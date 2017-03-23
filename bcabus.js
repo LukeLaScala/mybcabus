@@ -21,8 +21,7 @@ $(document).ready(function() {
         }
         return decodeURI(dc.substring(begin + prefix.length, end));
     }
-    var favCookie = getCookie("favorite");
-    }
+    
     var favCookie = getCookie("favorite");
     if (favCookie == null) {
         Materialize.toast("Click the star to set a favorite town",6000);
