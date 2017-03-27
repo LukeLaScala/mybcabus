@@ -109,7 +109,7 @@ $maxrows = count($locations) > count($names) ? count($locations) : count($names)
             </div>
         </div>
         <div class="fixed-action-btn">
-    <a class="btn-floating btn-large red" onclick="document.location.reload(true)">
+    <a class="btn-floating btn-large blue" onclick="document.location.reload(true)">
       <i class="large material-icons">replay</i>
     </a>
   </div>
