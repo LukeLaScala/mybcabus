@@ -1,8 +1,7 @@
 $(document).ready(function() {
     $favoriteList = $(".favoriteList");
-    $madeBy = $(".madeBy");
-    $closeMsg = $(".closeMadeBy");
-
+    
+    //Display message if cookie does not exist
     function getCookie(name) {
         var dc = document.cookie;
         var prefix = name + "=";
@@ -21,16 +20,14 @@ $(document).ready(function() {
         }
         return decodeURI(dc.substring(begin + prefix.length, end));
     }
+        var myCookie = getCookie("favorite");
+        if (myCookie == null) {
+            Materialize.toast("Click the star to set a favorite town",6000);
+        }
+        else {
+            $favoriteList.show(100);
+        }
     
-    var favCookie = getCookie("favorite");
-    if (favCookie == null) {
-        Materialize.toast("Click the star to set a favorite town",6000);
-    }
-    var closeCookie = getCookie("madeby");
-    $closeMsg.click(function() {
-        $madeBy.slideUp(100);
-    })
-
     //Works by #id of the list element
     $search = $("input[type='search']");
     $townItem = $(".townItem");
@@ -41,8 +38,12 @@ $(document).ready(function() {
             $townItem.not("[id*='" + $town + "']").hide(100);
             $(".collection-item[id*='" + $town + "']").show(100);
             $townHeader.hide(100);
+            $favoriteList.hide(100);
         }
         else {
             $townItem.show(100);
             $townHeader.show(100);
+            if (localStorage.getItem("favTown") !== null) { $favoriteList.show(100); };
+        }
+    })
 })
