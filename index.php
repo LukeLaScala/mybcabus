@@ -44,6 +44,7 @@ $maxrows = count($locations) > count($names) ? count($locations) : count($names)
                 location.reload();
         }
     </script>
+	
     <!-- Meta Tags/Site Setup -->
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -85,9 +86,9 @@ $maxrows = count($locations) > count($names) ? count($locations) : count($names)
     <!-- Town Display -->
     <main>
         <?php if(!isset($_COOKIE['madeby']) and rand(0,1) == 1) { ?>
-        <div class="madeBy blue lighten-3 white-text center-align">Sorry for the downtime yesterday - Luke LaScala<i onclick='setCookie("madeby", "none", 1000);' class="closeMadeBy material-icons secondary-content">close</i></div>
+        <div class="madeBy blue lighten-3 white-text center-align">Made by Luke LaScala & Adam Papenhausen<i onclick='setCookie("madeby", "none", 1000);' class="closeMadeBy material-icons secondary-content">close</i></div>
         <?php } else if(!isset($_COOKIE['madeby'])) { ?>
-	<div class="madeBy blue lighten-3 white-text center-align">Sorry for the downtime yesterday - Luke LaScala<i onclick='setCookie("madeby", "none", 1000);' class="closeMadeBy material-icons secondary-content">close</i></div>
+	<div class="madeBy blue lighten-3 white-text center-align">Made by Adam Papenhausen and Luke LaScala<i onclick='setCookie("madeby", "none", 1000);' class="closeMadeBy material-icons secondary-content">close</i></div>
 	<?php } ?>
         <div class="row" style="padding-top: 2%">
 
@@ -177,4 +178,14 @@ $maxrows = count($locations) > count($names) ? count($locations) : count($names)
             }
         }
     </style>
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-86115073-5', 'auto');
+  ga('send', 'pageview');
+
+</script>
 </html>
