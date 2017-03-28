@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- External Links -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-cookies.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+    <script> //Get & Parse JSON
+        var app = angular.module('myApp', ['ngCookies']);
+        app.controller('SuperCtrl',function($scope, $http, $timeout, $cookies) {
+            $scope.setCookie = function(cname, cvalue, clear) {
+                $cookies.put(cname, cvalue);
+                if (clear == "yes"){
+                    $scope.townSearch = "";
+                }
+            };
+            $scope.getData = function() {
+                //Sample: https://spreadsheets.google.com/feeds/list/1tJllDysWV5Xn9C7MKlVDttPXp2jXuQCYLP3jbf4FW28/od6/public/values?alt=json
+                //Real: https://spreadsheets.google.com/feeds/list/1S5v7kTbSiqV8GottWVi5tzpqLdTrEgWEY4ND4zvyV3o/od6/public/values?alt=json
+                $http.get("https://spreadsheets.google.com/feeds/list/1tJllDysWV5Xn9C7MKlVDttPXp2jXuQCYLP3jbf4FW28/od6/public/values?alt=json").success(function(response) {
+                    $scope.locations = response.feed.entry;
+                    var rowLength = $scope.locations.length;
+                    var townsFirst = [];
+                    var townsSecond = [];
+                    for (var i = 0; i < rowLength; i++) {
+                        if ($scope.locations[i].gsx$townsbuslocation.$t !== "") {
+                            townsFirst.push({"name": $scope.locations[i].gsx$townsbuslocation.$t.trim()});
+                            if ($scope.locations[i].hasOwnProperty('gsx$_cokwr')) {
+                                townsFirst[i].location = $scope.locations[i].gsx$_cokwr.$t.toUpperCase().trim();
+                            }
+                            else { townsFirst[i].location = ""; }
+                        }
+                        if ($scope.locations[i].gsx$townsbuslocation_2.$t !== "") {
+                            townsSecond.push({"name": $scope.locations[i].gsx$townsbuslocation_2.$t.trim()});
+                            if ($scope.locations[i].hasOwnProperty('gsx$_cre1l')) {
+                                townsSecond[i].location = $scope.locations[i].gsx$_cre1l.$t.toUpperCase().trim();
+                            }
+                            else { townsSecond[i].location = ""; }
+                        }
+
+                    }
+                    $scope.towns = townsFirst.concat(townsSecond);
+                    $scope.favorite = $scope.getCookie('favorite');
+                    if ($scope.favorite !== false) {
+                      $scope.townNames = $scope.towns.map(function(e) { return e.name; });
+                        for (i = 0; i < $scope.favorite.length; i++) {
+                            $scope.favTemp = $scope.towns[$scope.townNames.indexOf($scope.favorite[i].name)].location;
+                            if ($scope.favTemp == "") {
+                              $scope.favorite[i].location = "Not here yet!";
+                            }
+                            else if ($scope.favTemp !== "") {
+                              $scope.favorite[i].location = $scope.favTemp;
+                            }
+                        }
+                        $scope.setCookie('favorite',JSON.stringify($scope.favorite));
+                    }
+                    else { $scope.setCookie('favorite','none'); }
+                });
+            }
+            $scope.interval = function() {
+                $timeout(function() {
+                    $scope.getData();
+                    $scope.interval();
+                }, 2500)
+            };
+            $scope.getData();
+            $scope.interval();
+            $scope.addFavorite = function(val) {
+                if ($scope.getCookie('favorite') === null || $scope.getCookie('favorite') === true || $scope.getCookie('favorite') === false) {
+                    $scope.favoriteArray = [];
+                } else { $scope.favoriteArray = $scope.getCookie('favorite'); }
+                if ($scope.favoriteArray.map(function(e) { return e.name; }).indexOf(val['name']) === -1) {
+                    $scope.favoriteArray.push(val);
+                    $scope.setCookie('favorite',JSON.stringify($scope.favoriteArray), 'yes');
+                }
+                else { return; }
+            };
+            $scope.removeFavorite = function(val) {
+                if ($scope.favorite.indexOf(val) > -1 && $scope.favorite.length > 1) {
+                    $scope.favorite.splice($scope.favorite.indexOf(val), 1);
+                    $cookies.put('favorite',JSON.stringify($scope.favorite));
+                }
+                else if ($scope.favorite.length == 1) {
+                  $cookies.put('favorite','none');
+                }
+            }
+            $scope.getCookie = function(cname) {
+              if (cname !== 'favorite') {
+                return $cookies.get(cname);
+              }
+              else if ($cookies.get(cname) !== undefined) {
+                if ($cookies.get(cname) === 'none') {
+                  return true;
+                }
+                else if ($cookies.get(cname).substr(0,1) !== '[') { 
+                  return false;
+                }
+                else {
+                  return JSON.parse($cookies.get(cname));
+                }
+              }
+              else {
+                return false;
+              }
+            };
+            $scope.randomize = function(rand) {
+                if (rand == 1) {
+                    return "Made by: Luke LaScala & Adam Papenhausen";
+                }
+                else {
+                    return "Made by: Adam Papenhausen & Luke LaScala";
+                }
+            };
+        });
+        app.directive('scrollTop', function() {
+            return {
+                restrict: 'A',
+                link: function(scope, $elm) {
+                    $elm.on('click', function() {
+                    $("html, body").animate({ scrollTop: 0 }, "slow");
+                    });
+                }
+            }
+        });
+    </script>
+    <!-- Meta Tags -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="robots" content="index,follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');ga('create', 'UA-86115073-5', 'auto');ga('send', 'pageview');
+
+</script>
+    <!-- Icon -->
+    <link rel="icon" href="favicon.ico?" type="image/x-icon">
+
+    <!-- CSS/JQuery/Materialize -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+    <script src="bcabus.js"></script>
+    <title>BCABus</title>
+</head>
+
+<body class="blue lighten-5" ng-app="myApp" ng-controller="SuperCtrl">
+    <head>
+    <!-- Search -->
+    <nav class="mobile-content search-nav blue">
+    <div class="nav-wrapper">
+        <form>
+            <div class="input-field">
+            <input class="left-align" id="search" type="search" placeholder="Search for towns here..." autocomplete="off" ng-model="townSearch">
+            <label for="search"><i class="material-icons">search</i></label>
+            </div>
+        </form>
+    </div>
+    </nav>
+    <!-- Large Header -->
+    <nav class="not-mobile blue">
+        <div class="nav-wrapper">
+            <a style="padding: 0 2%" href="#" class="brand-logo">BCABus</a>
+        </div>
+    </nav>
+    </head>
+    
+    <!-- Main Content: Made By & Towns -->
+    <main>
+        <div ng-if="getCookie('madeby') !== 'none'" class="mobile-content madeBy blue lighten-3 white-text center-align">{{ randomize(Math.round(Math.random())) }}<i ng-click="setCookie('madeby', 'none');" class="closeMadeBy material-icons secondary-content">close</i></div>
+
+        <div class="row mobile-content" style="padding-top: 2%">
+            <div class="col l12 m12 s12">
+
+                <!-- Favorite Town -->
+                <ul ng-show="true" ng-if="getCookie('favorite') && getCookie('favorite') !== true" class="collection favoriteList">
+                <li ng-repeat="z in favorite" class="collection-item favoriteItem">
+                <div style="margin-top: -4%; margin-bottom: -2%;" class="valign-wrapper row">
+                    <h5 class="valign col l10 m10 s10 favoriteTown">{{z.name}}</h5>
+                    <p style="margin-left: 0" class="col l2 m2 s2">
+                    <i ng-click="removeFavorite(z)" style="font-size: 3rem; color: gold; cursor: pointer" class="valign material-icons">star</i>
+                    </p>
+                </div>
+                <div class="row">
+                    <h6 style="margin-bottom: -5%; margin-top: 0" class="col l10 m10 s10 favoriteLocation">{{z.location}}</h6>
+                </div>
+                </li>
+                </ul>
+
+                <!-- Town List -->
+                <ul class="townList collection with-header">
+                    <li ng-show="townSearch == ''" class="collection-header townList-header valign-wrapper"><h2>Town List</h2></li>
+                    <li ng-repeat="x in towns | filter: townSearch" style="height: 5%;" id='{{x|lowercase}}' class="noPad collection-item townItem">
+                        <div style="margin-top: -2%; margin-bottom: -3%; margin-left: -3%" class="valign-wrapper row">
+                        <p class="valign col l9 m9 s9"><span>{{x.name}}</span></p>
+                        <p class="valign locationAlign right-align col l1 m1 s1"><span>{{x.location}}&nbsp;&nbsp;</span></p>
+                        <p ng-click="addFavorite(x)" scroll-top class="valign col l1 m1 s1">
+                        <i style="color: grey; cursor: pointer" class="material-icons valign">star</i></p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="not-mobile row">
+        <div class="col l12 m12 s12 row">
+            <!-- Cards for Large Screens -->
+            <div ng-repeat="x in towns" class="col xl l4 m6 card white">
+                <div class="card-content black-text">
+                    <p>{{x.name}}</p><p>{{x.locations || "Not here yet"}}</p>
+                </div>
+            </div>
+        </div>
+        </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mobile-content valign page-footer blue darken-2 light-blue-text text-lighten-5 center-align">
+        <div style="padding-bottom: 5%"><h3>BCA Bus</h3><h6>Find your bus from anywhere.</h6><h6>Questions? Answers? Email us at <span class="email">adapap@bergen.org</span> or <span class="email">luklas@bergen.org</span>.</h6></div>
+        </footer>
+</body>
+<style>
+        #sitewrap {
+        }
+        ::-webkit-input-placeholder {
+        color: white;
+        }
+        :-moz-placeholder { /* Firefox 18- */
+           color: white;  
+        }
+        ::-moz-placeholder {  /* Firefox 19+ */
+           color: white;  
+        }
+        :-ms-input-placeholder {  
+           color: white;  
+        }
+        *:not(input) {
+          -webkit-touch-callout: none; /* iOS Safari */
+          -webkit-user-select: none; /* Safari */
+          -khtml-user-select: none; /* Konqueror HTML */
+          -moz-user-select: none; /* Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+          user-select: none;
+          outline: none;
+          -webkit-tap-highlight-color: rgba(255, 255, 255, 0); 
+          -webkit-tap-highlight-color: transparent;
+        }
+        h5 {
+          font-size: 1.3rem;
+        }
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+        .closeMadeBy {
+            padding-right: 1%;
+            color: white;
+            font-size: 1.5rem;
+        }
+        .email {
+            border-bottom: 1px solid white;
+            color: white;
+        }
+        .border {
+            border: 1px solid red;
+        }
+        .pullLeft {
+            left: 5%;
+        }
+        .madeBy {
+            width: 100%;
+            padding: 1% 0;
+        }
+        @media only screen and (max-width: 768px) { /* Mobile */
+            .not-mobile {
+                visibility: hidden;
+                display: none;
+            }
+        }
+        @media only screen and (min-width: 768px) { /* Desktop */
+            .mobile-content {
+                visibility: hidden;
+                display: none;
+            }
+            .xl {
+                margin-bottom: -1%;
+            }
+        }
+    </style>
+    <style> /* XL Size for TV & No Selection*/
+@media only screen and (min-width: 1900px) {
+    p {
+       font-size: 1.7rem;
+    }
+    .row .col.xl {
+        width:20%;
+        margin-left:0;
+        padding: 0.2% 0;
+    }
+    </style>
+</html>
+
