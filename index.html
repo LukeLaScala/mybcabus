@@ -10,7 +10,11 @@
         var app = angular.module('myApp', ['ngCookies']);
         app.controller('SuperCtrl',function($scope, $http, $timeout, $cookies) {
             $scope.setCookie = function(cname, cvalue, clear) {
-                $cookies.put(cname, cvalue);
+                var expireDate = new Date();
+                expireDate.setDate(expireDate.getDate() + 1);
+
+
+                $cookies.put(cname, cvalue, {'expires': expireDate});
                 if (clear == "yes"){
                     $scope.townSearch = "";
                 }
