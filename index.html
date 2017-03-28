@@ -104,14 +104,6 @@
                 return false;
               }
             };
-            $scope.randomize = function(rand) {
-                if (rand == 1) {
-                    return "Made by: Luke LaScala & Adam Papenhausen";
-                }
-                else {
-                    return "Made by: Adam Papenhausen & Luke LaScala";
-                }
-            };
         });
         app.directive('scrollTop', function() {
             return {
@@ -170,7 +162,6 @@
     
     <!-- Main Content: Made By & Towns -->
     <main>
-        <div ng-if="getCookie('madeby') !== 'none'" class="mobile-content madeBy blue lighten-3 white-text center-align">{{ randomize(Math.round(Math.random())) }}<i ng-click="setCookie('madeby', 'none');" class="closeMadeBy material-icons secondary-content">close</i></div>
 
         <div class="row mobile-content" style="padding-top: 2%">
             <div class="col l12 m12 s12">
