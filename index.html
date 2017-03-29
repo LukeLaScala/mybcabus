@@ -22,7 +22,7 @@
             $scope.getData = function() {
                 //Sample: https://spreadsheets.google.com/feeds/list/1tJllDysWV5Xn9C7MKlVDttPXp2jXuQCYLP3jbf4FW28/od6/public/values?alt=json
                 //Real: https://spreadsheets.google.com/feeds/list/1S5v7kTbSiqV8GottWVi5tzpqLdTrEgWEY4ND4zvyV3o/od6/public/values?alt=json
-                $http.get("https://spreadsheets.google.com/feeds/list/1tJllDysWV5Xn9C7MKlVDttPXp2jXuQCYLP3jbf4FW28/od6/public/values?alt=json").success(function(response) {
+                $http.get("https://spreadsheets.google.com/feeds/list/1S5v7kTbSiqV8GottWVi5tzpqLdTrEgWEY4ND4zvyV3o/od6/public/values?alt=json").success(function(response) {
                     $scope.locations = response.feed.entry;
                     var rowLength = $scope.locations.length;
                     var townsFirst = [];
@@ -205,7 +205,7 @@
             <!-- Cards for Large Screens -->
             <div ng-repeat="x in towns" class="col xl l4 m6 card white">
                 <div class="card-content black-text">
-                    <p>{{x.name}}</p><p>{{x.locations || "Not here yet"}}</p>
+                    <p>{{x.name}}</p><p>{{x.location || "Not here yet!"}}</p>
                 </div>
             </div>
         </div>
