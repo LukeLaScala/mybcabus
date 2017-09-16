@@ -11,7 +11,7 @@
         app.controller('SuperCtrl',function($scope, $http, $timeout, $cookies) {
             $scope.setCookie = function(cname, cvalue, clear) {
                 var expireDate = new Date();
-                expireDate.setDate(expireDate.getDate() + 1);
+                expireDate.setDate(expireDate.getDate() + 365);
 
 
                 $cookies.put(cname, cvalue, {'expires': expireDate});
