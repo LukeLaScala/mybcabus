@@ -11,17 +11,18 @@ def sendMessageAlerts(updates):
 
 	for update in updates:
 		town, location = update
-		conn =  pymysql.connect(unix_socket='/Applications/MAMP/tmp/mysql/mysql.sock',user='mybcabus', passwd='mybcabus', db='mybcabus')
+		conn = pymysql.connect(host='localhost', user='mybcabus',password='mybcabus',db='mybcabus')
 		cur = conn.cursor()
 		cur.execute("select town, number from user where town = %s", town)
 		for town, number in cur.fetchall():
+			print(number)
 			message = client.messages.create(
 		    to=str(number), 
 		    from_="+16282222870",
 		    body="The bus to " + town + " has arrived and is at spot " + location + "!")
 
 def getTownLocations():
-	sheet = json.loads(requests.get('https://spreadsheets.google.com/feeds/list/12npvFu56u3dXYLOXkNnWGx98qwlpWxvIP-8hp4HyMJ4/od6/public/values?alt=json').text)
+	sheet = json.loads(requests.get('https://spreadsheets.google.com/feeds/list/1S5v7kTbSiqV8GottWVi5tzpqLdTrEgWEY4ND4zvyV3o/od6/public/values?alt=json').text)
 
 	townLocations = list()
 

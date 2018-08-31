@@ -15,6 +15,6 @@ $fb = new Facebook\Facebook([
 $helper = $fb->getRedirectLoginHelper();
 
 $permissions = ['email']; // Optional permissions
-$loginUrl = $helper->getLoginUrl('http://localhost:8888/GitHub/mybcabus/test/fb-callback.php', $permissions);
+$loginUrl = $helper->getLoginUrl('http://mybcabus.com/test/fb-callback.php', $permissions);
 header("Location: $loginUrl");
 ?>

@@ -28,7 +28,8 @@
             $town = $_POST['town'];
 
             add_subscription($number, $town, 10);
-            break;
+            header("Location: controller.php");
+	    break;
         case "":
 		case "home":
 			include 'home.php';
