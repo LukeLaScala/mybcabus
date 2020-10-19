@@ -28,17 +28,17 @@
                     var townsFirst = [];
                     var townsSecond = [];
                     for (var i = 0; i < rowLength; i++) {
-                        if ($scope.locations[i].gsx$townsbuslocation.$t !== "") {
-                            townsFirst.push({"name": $scope.locations[i].gsx$townsbuslocation.$t.trim()});
-                            if ($scope.locations[i].hasOwnProperty('gsx$_cokwr')) {
-                                townsFirst[i].location = $scope.locations[i].gsx$_cokwr.$t.toUpperCase().trim();
+                        if ($scope.locations[i].gsx$towns.$t !== "") {
+                            townsFirst.push({"name": $scope.locations[i].gsx$towns.$t.trim()});
+                            if ($scope.locations[i].hasOwnProperty('gsx$loc')) {
+                                townsFirst[i].location = $scope.locations[i].gsx$loc.$t.toUpperCase().trim();
                             }
                             else { townsFirst[i].location = ""; }
                         }
-                        if ($scope.locations[i].gsx$townsbuslocation_2.$t !== "") {
-                            townsSecond.push({"name": $scope.locations[i].gsx$townsbuslocation_2.$t.trim()});
-                            if ($scope.locations[i].hasOwnProperty('gsx$_cre1l')) {
-                                townsSecond[i].location = $scope.locations[i].gsx$_cre1l.$t.toUpperCase().trim();
+                        if ($scope.locations[i].gsx$townsbuslocation.$t !== "") {
+                            townsSecond.push({"name": $scope.locations[i].gsx$townsbuslocation.$t.trim()});
+                            if ($scope.locations[i].hasOwnProperty('gsx$loc_2')) {
+                                townsSecond[i].location = $scope.locations[i].gsx$loc_2.$t.toUpperCase().trim();
                             }
                             else { townsSecond[i].location = ""; }
                         }
